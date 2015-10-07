@@ -5,12 +5,12 @@ MAINTAINER t.dettrick@uq.edu.au
 ENV PETSC_VERSION 3.5.3
 
 RUN fsudo yum install -y \
-  mercurial \
   libxml2-devel libpng-devel \
   openmpi-devel hdf5-openmpi-static \
   hostname time \
   gdal-devel geos-devel proj-devel libxml2-devel libxslt-devel \
-  mesa-libOSMesa-devel mesa-libGLU-devel libX11-devel
+  mesa-libOSMesa-devel mesa-libGLU-devel libX11-devel \
+  swig
 
 
 # Install PETSc
@@ -25,7 +25,7 @@ RUN cd /tmp && \
     cd /tmp && \
     rm -r petsc-$PETSC_VERSION
 
-RUN hg clone -b newInterface https://bitbucket.org/underworldproject/underworld2 /opt/underworld
+RUN git clone https://github.com/underworldcode/underworld2.git /opt/underworld
 
 
 
@@ -45,6 +45,8 @@ RUN cd /opt/underworld/libUnderworld && \
     export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:$LD_LIBRARY_PATH && \
     source /opt/python/bin/activate && \
     ./configure.py --cxx=/usr/lib64/openmpi/bin/mpicxx --cc=/usr/lib64/openmpi/bin/mpicc --mpi-lib-dir=/usr/lib64/openmpi/lib --mpi-inc-dir=/usr/include/openmpi-x86_64 && \
+    ./scons.py && \
+    cd libUnderworldPy ; ./swigall.py ; cd ../ && \
     ./scons.py && \
     (rm /opt/underworld/libUnderworld/build/bin/LavaVu || true)
 
